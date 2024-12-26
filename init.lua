@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -189,6 +189,13 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+vim.keymap.set('n', '<C-a>v', 'silent !tmux split-window -v<CR>', { desc = 'Split a vertical tmux window' })
+vim.keymap.set('n', '<C-a>s', 'silent !tmux split-window -h<CR>', { desc = 'Split a horizontal tmux window' })
+
+vim.api.nvim_set_keymap('n', '<C-s>', ':write<CR>', { noremap = true, silent = false }) -- Normal mode
+vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:write<CR>a', { noremap = true, silent = false }) -- Insert mode
+vim.api.nvim_set_keymap('v', '<C-s>', '<Esc>:write<CR>', { noremap = true, silent = false }) -- Visual mode
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -411,7 +418,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -615,9 +621,9 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -891,6 +897,77 @@ require('lazy').setup({
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
+  },
+  {
+    'mfussenegger/nvim-dap',
+    dependencies = {
+      'nvim-neotest/nvim-nio',
+      'rcarriga/nvim-dap-ui',
+      'theHamsta/nvim-dap-virtual-text',
+      'williamboman/mason.nvim',
+    },
+    config = function()
+      local dap = require 'dap'
+      local ui = require 'dapui'
+
+      require('dapui').setup()
+      require('nvim-dap-virtual-text').setup {}
+
+      dap.adapters.gdb = {
+        type = 'executable',
+        command = 'gdb',
+        args = { '--interpreter=dap', '--eval-command', 'set print pretty on' },
+      }
+      require('dap.ext.vscode').load_launchjs(nil, { cppdbg = { 'c', 'cpp' } })
+
+      vim.keymap.set('n', '<space>b', dap.toggle_breakpoint)
+      vim.keymap.set('n', '<space>gb', dap.run_to_cursor)
+
+      -- Eval var under cursor
+      vim.keymap.set('n', '<space>?', function()
+        require('dapui').eval(nil, { enter = true })
+      end)
+
+      vim.keymap.set('n', '<F1>', dap.continue)
+      vim.keymap.set('n', '<F2>', dap.step_into)
+      vim.keymap.set('n', '<F3>', dap.step_over)
+      vim.keymap.set('n', '<F4>', dap.step_out)
+      vim.keymap.set('n', '<F5>', dap.step_back)
+      vim.keymap.set('n', '<F13>', dap.restart)
+
+      --vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
+      --vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
+
+      dap.listeners.before.attach.dapui_config = function()
+        ui.open()
+      end
+      dap.listeners.before.launch.dapui_config = function()
+        ui.open()
+      end
+      dap.listeners.before.event_terminated.dapui_config = function()
+        ui.close()
+      end
+      dap.listeners.before.event_exited.dapui_config = function()
+        ui.close()
+      end
+    end,
+  },
+  {
+    'christoomey/vim-tmux-navigator',
+    cmd = {
+      'TmuxNavigateLeft',
+      'TmuxNavigateDown',
+      'TmuxNavigateUp',
+      'TmuxNavigateRight',
+      'TmuxNavigatePrevious',
+    },
+    keys = {
+      { '<c-h>', '<cmd><C-U>TmuxNavigateLeft<cr>' },
+      { '<c-j>', '<cmd><C-U>TmuxNavigateDown<cr>' },
+      { '<c-k>', '<cmd><C-U>TmuxNavigateUp<cr>' },
+      { '<c-l>', '<cmd><C-U>TmuxNavigateRight<cr>' },
+      { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>' },
+    },
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
