@@ -190,8 +190,8 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-vim.keymap.set('n', '<C-a>v', 'silent !tmux split-window -v<CR>', { desc = 'Split a vertical tmux window' })
-vim.keymap.set('n', '<C-a>s', 'silent !tmux split-window -h<CR>', { desc = 'Split a horizontal tmux window' })
+vim.keymap.set('n', '<C-a>v', ':silent !tmux split-window -v<CR>', { desc = 'Split a vertical tmux window' })
+vim.keymap.set('n', '<C-a>s', ':silent !tmux split-window -h<CR>', { desc = 'Split a horizontal tmux window' })
 
 vim.api.nvim_set_keymap('n', '<C-s>', ':write<CR>', { noremap = true, silent = false }) -- Normal mode
 vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:write<CR>a', { noremap = true, silent = false }) -- Insert mode
@@ -621,7 +621,7 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd = {},
+        clangd = { cmd = { 'clangd', '--compile-commands-dir=build' } },
         -- gopls = {},
         pyright = {},
         -- rust_analyzer = {},
@@ -910,6 +910,8 @@ require('lazy').setup({
       local dap = require 'dap'
       local ui = require 'dapui'
 
+      require('dap').set_log_level 'TRACE'
+
       require('dapui').setup()
       require('nvim-dap-virtual-text').setup {}
 
@@ -922,6 +924,7 @@ require('lazy').setup({
 
       vim.keymap.set('n', '<space>b', dap.toggle_breakpoint)
       vim.keymap.set('n', '<space>gb', dap.run_to_cursor)
+      vim.keymap.set('n', '<space>lb', dap.list_breakpoints)
 
       -- Eval var under cursor
       vim.keymap.set('n', '<space>?', function()
@@ -933,10 +936,11 @@ require('lazy').setup({
       vim.keymap.set('n', '<F3>', dap.step_over)
       vim.keymap.set('n', '<F4>', dap.step_out)
       vim.keymap.set('n', '<F5>', dap.step_back)
-      vim.keymap.set('n', '<F13>', dap.restart)
+      vim.keymap.set('n', '<F6>', dap.terminate)
+      vim.keymap.set('n', '<F12>', dap.restart)
 
-      --vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
-      --vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
+      vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
+      vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
 
       dap.listeners.before.attach.dapui_config = function()
         ui.open()
