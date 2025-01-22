@@ -83,7 +83,6 @@ I hope you enjoy your Neovim journey,
 
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
-
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -623,7 +622,17 @@ require('lazy').setup({
       local servers = {
         clangd = { cmd = { 'clangd', '--compile-commands-dir=build' } },
         -- gopls = {},
-        pyright = {},
+        pyright = {
+          cmd = { 'pyright-langserver', '--stdio', '--verbose', '--pythonpath=/usr/bin/python3' },
+          settings = {
+            python = {
+              analysis = {
+                logLevel = 'Trace', -- Options: 'Error', 'Warning', 'Info', 'Trace'
+              },
+            },
+          },
+        },
+
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -791,11 +800,11 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          --['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<CR>'] = cmp.mapping.confirm { select = true },
           --['<Tab>'] = cmp.mapping.select_next_item(),
           --['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
@@ -910,7 +919,7 @@ require('lazy').setup({
       local dap = require 'dap'
       local ui = require 'dapui'
 
-      require('dap').set_log_level 'TRACE'
+      --require('dap').set_log_level 'TRACE'
 
       require('dapui').setup()
       require('nvim-dap-virtual-text').setup {}
@@ -920,6 +929,7 @@ require('lazy').setup({
         command = 'gdb',
         args = { '--interpreter=dap', '--eval-command', 'set print pretty on' },
       }
+
       require('dap.ext.vscode').load_launchjs(nil, { cppdbg = { 'c', 'cpp' } })
 
       vim.keymap.set('n', '<space>b', dap.toggle_breakpoint)
@@ -1047,5 +1057,6 @@ require('lazy').setup({
   },
 })
 
+vim.lsp.set_log_level 'trace'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
