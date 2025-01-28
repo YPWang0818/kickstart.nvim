@@ -90,7 +90,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = true
+vim.g.have_nerd_font = false
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -192,8 +192,21 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<C-a>v', ':silent !tmux split-window -v<CR>', { desc = 'Split a vertical tmux window' })
 vim.keymap.set('n', '<C-a>s', ':silent !tmux split-window -h<CR>', { desc = 'Split a horizontal tmux window' })
 
+vim.keymap.set('n', '<M-z>', function()
+  if vim.wo.wrap then
+    vim.wo.wrap = false
+    print 'Line wrap: OFF'
+  else
+    vim.wo.wrap = true
+    print 'Line wrap: ON'
+  end
+end, { desc = 'Toggle line wrap' })
+vim.wo.spell = true
+
+vim.keymap.set('n', '<C-x>', '<cmd>cclose<CR>', { desc = 'Close the quickfix window' })
+
 vim.api.nvim_set_keymap('n', '<C-s>', ':write<CR>', { noremap = true, silent = false }) -- Normal mode
-vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:write<CR>a', { noremap = true, silent = false }) -- Insert mode
+vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:write<CR>', { noremap = true, silent = false }) -- Insert mode
 vim.api.nvim_set_keymap('v', '<C-s>', '<Esc>:write<CR>', { noremap = true, silent = false }) -- Visual mode
 
 -- [[ Basic Autocommands ]]
@@ -620,18 +633,9 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd = { cmd = { 'clangd', '--compile-commands-dir=build' } },
+        --clangd = { cmd = { 'clangd', '--compile-commands-dir=build' } },
         -- gopls = {},
-        pyright = {
-          cmd = { 'pyright-langserver', '--stdio', '--verbose', '--pythonpath=/usr/bin/python3' },
-          settings = {
-            python = {
-              analysis = {
-                logLevel = 'Trace', -- Options: 'Error', 'Warning', 'Info', 'Trace'
-              },
-            },
-          },
-        },
+        -- pyright = {},
 
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -642,7 +646,11 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
-
+        texlab = {
+          settings = {
+            latexFormatter = 'texlab',
+          },
+        },
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -908,64 +916,17 @@ require('lazy').setup({
     end,
   },
   {
-    'mfussenegger/nvim-dap',
-    dependencies = {
-      'nvim-neotest/nvim-nio',
-      'rcarriga/nvim-dap-ui',
-      'theHamsta/nvim-dap-virtual-text',
-      'williamboman/mason.nvim',
-    },
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
     config = function()
-      local dap = require 'dap'
-      local ui = require 'dapui'
-
-      --require('dap').set_log_level 'TRACE'
-
-      require('dapui').setup()
-      require('nvim-dap-virtual-text').setup {}
-
-      dap.adapters.gdb = {
-        type = 'executable',
-        command = 'gdb',
-        args = { '--interpreter=dap', '--eval-command', 'set print pretty on' },
-      }
-
-      require('dap.ext.vscode').load_launchjs(nil, { cppdbg = { 'c', 'cpp' } })
-
-      vim.keymap.set('n', '<space>b', dap.toggle_breakpoint)
-      vim.keymap.set('n', '<space>gb', dap.run_to_cursor)
-      vim.keymap.set('n', '<space>lb', dap.list_breakpoints)
-
-      -- Eval var under cursor
-      vim.keymap.set('n', '<space>?', function()
-        require('dapui').eval(nil, { enter = true })
-      end)
-
-      vim.keymap.set('n', '<F1>', dap.continue)
-      vim.keymap.set('n', '<F2>', dap.step_into)
-      vim.keymap.set('n', '<F3>', dap.step_over)
-      vim.keymap.set('n', '<F4>', dap.step_out)
-      vim.keymap.set('n', '<F5>', dap.step_back)
-      vim.keymap.set('n', '<F6>', dap.terminate)
-      vim.keymap.set('n', '<F12>', dap.restart)
-
-      vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
-      vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
-
-      dap.listeners.before.attach.dapui_config = function()
-        ui.open()
-      end
-      dap.listeners.before.launch.dapui_config = function()
-        ui.open()
-      end
-      dap.listeners.before.event_terminated.dapui_config = function()
-        ui.close()
-      end
-      dap.listeners.before.event_exited.dapui_config = function()
-        ui.close()
-      end
+      -- VimTeX configuration goes here, e.g.
+      vim.g.vimtex_view_method = 'zathura'
+      vim.g.vimtex_compiler_latexmk = { ['continuous'] = 0 }
+      vim.g.maplocalleader = ','
     end,
   },
+
   {
     'christoomey/vim-tmux-navigator',
     cmd = {
@@ -994,6 +955,7 @@ require('lazy').setup({
       auto_install = true,
       highlight = {
         enable = true,
+        disable = { 'latex' },
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
