@@ -193,7 +193,7 @@ vim.keymap.set('n', '<C-a>v', ':silent !tmux split-window -v<CR>', { desc = 'Spl
 vim.keymap.set('n', '<C-a>s', ':silent !tmux split-window -h<CR>', { desc = 'Split a horizontal tmux window' })
 
 vim.api.nvim_set_keymap('n', '<C-s>', ':write<CR>', { noremap = true, silent = false }) -- Normal mode
-vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:write<CR>a', { noremap = true, silent = false }) -- Insert mode
+vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:write<CR>', { noremap = true, silent = false }) -- Insert mode
 vim.api.nvim_set_keymap('v', '<C-s>', '<Esc>:write<CR>', { noremap = true, silent = false }) -- Visual mode
 
 -- [[ Basic Autocommands ]]
