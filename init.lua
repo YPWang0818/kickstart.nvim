@@ -90,7 +90,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -874,7 +874,12 @@ require('lazy').setup({
       vim.cmd.hi 'Comment gui=none'
     end,
   },
-
+  --  {
+  --    'rebelot/kanagawa.nvim', -- neorg needs a colorscheme with treesitter support
+  --    config = function()
+  --      vim.cmd.colorscheme 'kanagawa'
+  --    end,
+  --  },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -918,11 +923,11 @@ require('lazy').setup({
   {
     'lervag/vimtex',
     lazy = false, -- we don't want to lazy load VimTeX
-    -- tag = "v2.15", -- uncomment to pin to a specific release
+    tag = 'v2.15', -- uncomment to pin to a specific release
     config = function()
       -- VimTeX configuration goes here, e.g.
       vim.g.vimtex_view_method = 'zathura'
-      vim.g.vimtex_compiler_latexmk = { ['continuous'] = 0 }
+      vim.g.vimtex_compiler_latexmk = { ['continuous'] = 1 }
       vim.g.maplocalleader = ','
     end,
   },
@@ -1019,6 +1024,6 @@ require('lazy').setup({
   },
 })
 
-vim.lsp.set_log_level 'trace'
+--vim.lsp.set_log_level 'trace'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
