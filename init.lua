@@ -223,6 +223,12 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'qf' },
+  callback = function()
+    vim.keymap.set('n', 'q', '<cmd>cclose<cr>', { silent = true, buffer = true })
+  end,
+})
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -651,8 +657,7 @@ require('lazy').setup({
             latexFormatter = 'texlab',
           },
         },
-        lua_ls = {
-          -- cmd = {...},
+        lua_ls = { -- cmd = {...},
           -- filetypes = { ...},
           -- capabilities = {},
           settings = {
@@ -874,12 +879,12 @@ require('lazy').setup({
       vim.cmd.hi 'Comment gui=none'
     end,
   },
-  --  {
-  --    'rebelot/kanagawa.nvim', -- neorg needs a colorscheme with treesitter support
-  --    config = function()
-  --      vim.cmd.colorscheme 'kanagawa'
-  --    end,
-  --  },
+  {
+    'rebelot/kanagawa.nvim', -- neorg needs a colorscheme with treesitter support
+    config = function()
+      vim.cmd.colorscheme 'kanagawa'
+    end,
+  },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -925,10 +930,31 @@ require('lazy').setup({
     lazy = false, -- we don't want to lazy load VimTeX
     tag = 'v2.15', -- uncomment to pin to a specific release
     config = function()
-      -- VimTeX configuration goes here, e.g.
-      vim.g.vimtex_view_method = 'zathura'
-      vim.g.vimtex_compiler_latexmk = { ['continuous'] = 1 }
+      -- Viewer settings
+      vim.g.vimtex_view_method = 'zathura' -- For Wayland compatibility, avoid xdotool
       vim.g.maplocalleader = ','
+      vim.g.vimtex_context_pdf_viewer = 'okular' -- External PDF viewer for the Vimtex menu
+
+      -- Formatting settings
+      -- vim.g.vimtex_format_enabled = true             -- Enable formatting with latexindent
+      -- vim.g.vimtex_format_program = 'latexindent'
+
+      -- Indentation settings
+      vim.g.vimtex_indent_enabled = false -- Disable auto-indent from Vimtex
+      vim.g.tex_indent_items = false -- Disable indent for enumerate
+      vim.g.tex_indent_brace = false -- Disable brace indent
+      vim.g.vimtex_compiler_latexmk = { ['continuous'] = 0 }
+      -- Suppression settings
+      vim.g.vimtex_quickfix_mode = 0 -- Suppress quickfix on save/build
+      vim.g.vimtex_log_ignore = { -- Suppress specific log messages
+        'Underfull',
+        'Overfull',
+        'specifier changed to',
+        'Token not allowed in a PDF string',
+      }
+
+      -- Other settings
+      vim.g.tex_flavor = 'latex' -- Set file type for TeX files
     end,
   },
 
