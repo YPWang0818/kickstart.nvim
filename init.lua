@@ -156,6 +156,10 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+vim.opt.softtabstop = 2
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -254,7 +258,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  --'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -406,7 +410,6 @@ require('lazy').setup({
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
-        --
         -- defaults = {
         --   mappings = {
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
@@ -419,6 +422,7 @@ require('lazy').setup({
           },
         },
       }
+      require('telescope').load_extension 'luasnip'
 
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
@@ -426,6 +430,10 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
+      local extra = require('telescope').extensions
+
+      vim.keymap.set('n', '<leader>st', extra.luasnip.luasnip, { desc = '[S]earch snippe[T]' })
+
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -745,7 +753,37 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'L3MON4D3/LuaSnip',
+    -- follow latest release.
+    version = 'v2.*', -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+    -- install jsregexp (optional!).
+    build = 'make install_jsregexp',
+    config = function()
+      local ls = require 'luasnip'
 
+      vim.keymap.set({ 'i', 's' }, '<C-K>', function()
+        ls.expand()
+      end, { silent = true })
+      vim.keymap.set({ 'i', 's' }, '<C-L>', function()
+        ls.jump(1)
+      end, { silent = true })
+      vim.keymap.set({ 'i', 's' }, '<C-J>', function()
+        ls.jump(-1)
+      end, { silent = true })
+
+      vim.keymap.set({ 'i', 's' }, '<C-E>', function()
+        if ls.choice_active() then
+          ls.change_choice(1)
+        end
+      end, { silent = true })
+
+      require('luasnip.loaders.from_lua').load { paths = '~/.config/nvim/LuaSnip/' }
+    end,
+  },
+  {
+    'benfowler/telescope-luasnip.nvim',
+  },
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -786,7 +824,7 @@ require('lazy').setup({
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
-      luasnip.config.setup {}
+      luasnip.config.setup { enable_autosnippets = true }
 
       cmp.setup {
         snippet = {
@@ -813,11 +851,11 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          --['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          ['<CR>'] = cmp.mapping.confirm { select = true },
+          --['<CR>'] = cmp.mapping.confirm { select = true },
           --['<Tab>'] = cmp.mapping.select_next_item(),
           --['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
@@ -928,10 +966,10 @@ require('lazy').setup({
   {
     'lervag/vimtex',
     lazy = false, -- we don't want to lazy load VimTeX
-    tag = 'v2.15', -- uncomment to pin to a specific release
+    --tag = 'v2.15', -- uncomment to pin to a specific release
     config = function()
       -- Viewer settings
-      vim.g.vimtex_view_method = 'zathura' -- For Wayland compatibility, avoid xdotool
+      vim.g.vimtex_view_method = 'sioyek' -- For Wayland compatibility, avoid xdotool
       vim.g.maplocalleader = ','
       vim.g.vimtex_context_pdf_viewer = 'okular' -- External PDF viewer for the Vimtex menu
 

@@ -1,8 +1,13 @@
 
 set nocompatible
+let g:maplocalleader = ","
 
 " Load vim-plug with vimtex
 call plug#begin('~/.vim/plugged')
 Plug 'lervag/vimtex'
 call plug#end()
 
+let g:latex_view_general_viewer = "zathura_simple"
+let g:vimtex_view_method = "zathura_simple"
+
+let g:vimtex_compiler_latexmk = {'continuous': 0 }
