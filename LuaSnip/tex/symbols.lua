@@ -43,6 +43,8 @@ local greek_lower = {
 }
 
 local greek_upper = {
+  G = 'Gamma',
+  D = 'Delta',
   Z = 'Zeta',
   Y = 'Eta',
   H = 'Theta',
@@ -67,7 +69,7 @@ for dig, name in pairs(greek_lower) do
     greek_snips,
     s(
       { trig = trig, wordTrig = false, regTrig = true, priority = 2000, snippetType = 'autosnippet', dscr = '\\' .. name, condition = in_mathzone },
-      t { '\\' .. name }
+      t { '\\' .. name .. ' ' }
     )
   )
 end
@@ -78,7 +80,7 @@ for dig, name in pairs(greek_upper) do
     greek_snips,
     s(
       { trig = trig, wordTrig = false, regTrig = true, priority = 2000, snippetType = 'autosnippet', dscr = '\\' .. name, condition = in_mathzone },
-      t { '\\' .. name }
+      t { '\\' .. name .. ' ' }
     )
   )
 end
@@ -87,23 +89,23 @@ vim.list_extend(M, greek_snips)
 
 local symbol_spec = {
   -- operators
-  ['!='] = [[\neq]],
-  ['<='] = [[\leq]],
-  ['>='] = [[\geq]],
-  ['<<'] = [[\ll]],
-  ['>>'] = [[\gg]],
-  ['~~'] = [[\sim]],
-  ['~='] = [[\approx]],
-  ['~%-'] = [[\simeq]],
-  ['%-~'] = [[\backsimeq]],
-  ['%-='] = [[\equiv]],
-  ['=~'] = [[\cong]],
-  [':='] = [[\definedas]],
-  ['%.'] = [[\cdot]],
-  ['%.%.'] = [[\cdots]],
-  ['%*'] = [[\times]],
-  ['!%+'] = [[\oplus]],
-  ['!%*'] = [[\otimes]],
+  nq = [[\neq]],
+  lq = [[\leq]],
+  gq = [[\geq]],
+  ll = [[\ll]],
+  gg = [[\gg]],
+  si = [[\sim]],
+  ax = [[\approx]],
+  siq = [[\simeq]],
+  bsq = [[\backsimeq]],
+  ev = [[\equiv]],
+  cg = [[\cong]],
+  def = [[\definedas]],
+  ct = [[\cdot]],
+  cts = [[\cdots]],
+  ts = [[\times]],
+  op = [[\oplus]],
+  ot = [[\otimes]],
   --maths
   NN = [[\mathbb{N}]],
   ZZ = [[\mathbb{Z}]],
@@ -119,24 +121,26 @@ local symbol_spec = {
   UU = [[\cup]],
 
   --arrows
-  ['%->'] = [[\rightarrow]],
-  ['=>'] = [[\Rightarrow]],
-  ['!>'] = [[\mapsto]],
-  ['<%-'] = [[\leftarrow]],
-  ['<!='] = [[Leftarrow]],
-  ['%-%->'] = [[\longrightarrow]],
-  ['==>'] = [[\Longrightarrow]],
-  ['<%-%-'] = [[\longleftarrow]],
-  ['<=='] = [[\Longleftarrow]],
-  ['<%->'] = [[\leftrightarrow]],
-  ['<=>'] = [[\Leftrightarrow]],
+  ra = [[\rightarrow]],
+  Ra = [[\Rightarrow]],
+  mpt = [[\mapsto]],
+  la = [[\leftarrow]],
+  La = [[\Leftarrow]],
+  lra = [[\longrightarrow]],
+  Lra = [[\Longrightarrow]],
+  lla = [[\longleftarrow]],
+  Lla = [[\Longleftarrow]],
+  LrA = [[\leftrightarrow]],
+  LRA = [[\Leftrightarrow]],
   oo = [[\infty]],
-  ll = [[\ell]],
+  el = [[\ell]],
   dg = [[\dagger]],
-  ['%+%-'] = [[\pm]],
-  ['%-%+'] = [[\mp]],
+  pm = [[\pm]],
+  mp = [[\mp]],
   qu = [[\quad]],
   en = [[\enspace]],
+  lg = [[\langle]],
+  rg = [[\rangle]],
 }
 
 local symbol_snips = {}
@@ -145,7 +149,7 @@ for dig, name in pairs(symbol_spec) do
   local trig = ';' .. dig .. '[%s]'
   table.insert(
     symbol_snips,
-    s({ trig = trig, wordTrig = false, regTrig = true, priority = 1000, snippetType = 'autosnippet', condition = in_mathzone, dscr = name }, t(name))
+    s({ trig = trig, wordTrig = false, regTrig = true, priority = 1000, snippetType = 'autosnippet', condition = in_mathzone, dscr = name }, t(name .. ' '))
   )
 end
 
