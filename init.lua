@@ -93,7 +93,7 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
--- See `:help vim.opt`
+-- See `:help vig.opt`
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
@@ -155,7 +155,7 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
-
+-- Set concealcursor
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -232,6 +232,7 @@ vim.opt.rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
+--
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -244,9 +245,7 @@ require('lazy').setup({
   -- Use `opts = {}` to force a plugin to be loaded.
   --
 
-  -- Here is a more advanced example where we pass configuration
-  -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
-  --    require('gitsigns').setup({ ... })
+  -- Here is a more advanced example where we pass configuration    -- options to `gitsigns.nvim`. This is equivalent to the following Lua:    --    require('gitsigns').setup({ ... })
   --
   -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
@@ -621,7 +620,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = { cmd = { 'clangd', '--compile-commands-dir=build' } },
-        -- gopls = {},
+        gopls = {},
         pyright = {
           cmd = { 'pyright-langserver', '--stdio', '--verbose', '--pythonpath=/usr/bin/python3' },
           settings = {
@@ -689,7 +688,6 @@ require('lazy').setup({
       }
     end,
   },
-
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -984,6 +982,45 @@ require('lazy').setup({
       { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>' },
     },
   },
+  {
+    'nvim-neorg/neorg',
+    lazy = false,
+    version = '*',
+    config = function()
+      require('neorg').setup {
+        load = {
+          ['core.defaults'] = {},
+          ['core.concealer'] = {},
+          ['core.dirman'] = {
+            config = {
+              workspaces = {
+                notes = '~/Documents/notes',
+              },
+              default_workspace = 'notes',
+            },
+          },
+          ['core.esupports.metagen'] = {
+            config = {
+              author = 'njcat',
+              timzone = 'utc',
+              type = 'auto',
+              update_date = false,
+            },
+          },
+        },
+      }
+
+      vim.wo.foldlevel = 99
+      vim.wo.conceallevel = 2
+    end,
+  },
+  {
+    'VPavliashvili/json-nvim',
+    config = function()
+      vim.keymap.set('n', '<leader>jff', '<cmd>JsonFormatFile<cr>')
+      vim.keymap.set('n', '<leader>jmf', '<cmd>JsonMinifyFile<cr>')
+    end,
+  },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
@@ -1058,6 +1095,6 @@ require('lazy').setup({
   },
 })
 
-vim.lsp.set_log_level 'trace'
+-- vim.lsp.set_log_level 'trace'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
