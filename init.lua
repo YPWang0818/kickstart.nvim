@@ -156,7 +156,13 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+vim.opt.softtabstop = 2
+
 -- [[ Basic Keymaps ]]
+
 --  See `:help vim.keymap.set()`
 
 -- Clear highlights on search when pressing <Esc> in normal mode
@@ -191,6 +197,15 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 
 vim.keymap.set('n', '<C-a>v', ':silent !tmux split-window -v<CR>', { desc = 'Split a vertical tmux window' })
 vim.keymap.set('n', '<C-a>s', ':silent !tmux split-window -h<CR>', { desc = 'Split a horizontal tmux window' })
+
+vim.keymap.set('n', '<leader>cl', function()
+  local filepath = vim.fn.expand '%:.' -- Full path to the current file
+  local linenr = vim.fn.line '.' -- Current line number
+  local result = filepath .. ':' .. linenr
+
+  vim.fn.setreg('+', result) -- Copy to system clipboard
+  vim.notify('Copied: ' .. result)
+end, { desc = 'Copy file:line to clipboard' })
 
 vim.api.nvim_set_keymap('n', '<C-s>', ':write<CR>', { noremap = true, silent = false }) -- Normal mode
 vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:write<CR>', { noremap = true, silent = false }) -- Insert mode
@@ -235,7 +250,8 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  --
+  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -620,8 +636,8 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd = { cmd = { 'clangd', '--compile-commands-dir=build' } },
-        -- gopls = {},
+        clangd = { cmd = { 'clangd', '--compile-commands-dir=build/debug' } },
+        gopls = {},
         pyright = {
           cmd = { 'pyright-langserver', '--stdio', '--verbose', '--pythonpath=/usr/bin/python3' },
           settings = {
@@ -1057,6 +1073,6 @@ require('lazy').setup({
   },
 })
 
-vim.lsp.set_log_level 'trace'
+--vim.lsp.set_log_level 'trace'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
